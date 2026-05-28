@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: assignment-esg-ingestion-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: assignment-esg-ingestion-db
+          property: connectionString
+      - key: DATABASE_SSL_REQUIRE
+        value: True
+      - key: DATABASE_CONN_MAX_AGE
+        value: 60
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: True
+      - key: DJANGO_SECURE_HSTS_SECONDS
+        value: 0
+      - key: DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: False
+      - key: DJANGO_SECURE_HSTS_PRELOAD
+        value: False
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+
+databases:
+  - name: assignment-esg-ingestion-db
+    plan: free
