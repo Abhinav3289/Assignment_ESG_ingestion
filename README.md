@@ -6,16 +6,16 @@ Django REST and React prototype for ingesting ESG activity data from SAP, utilit
 
 ### Frontend Service
 
-- Live app: https://smart-ingestion-engine.vercel.app
+- Live app: https://assignment-esg-ingestion.vercel.app/
 
 ### Backend Service
 
-- Backend base URL: https://smart-ingestion-engine.onrender.com
-- Upload endpoint: https://smart-ingestion-engine.onrender.com/api/ingest/upload/
-- Records API: https://smart-ingestion-engine.onrender.com/api/review/records/
-- Flagged records API: https://smart-ingestion-engine.onrender.com/api/review/records/flagged/
-- Batches API: https://smart-ingestion-engine.onrender.com/api/review/batches/
-- Parse errors API: https://smart-ingestion-engine.onrender.com/api/review/errors/
+- Backend base URL: https://assignment-esg-ingestion.onrender.com
+- Upload endpoint: https://assignment-esg-ingestion.onrender.com/api/ingest/upload/
+- Records API: https://assignment-esg-ingestion.onrender.com/api/review/records/
+- Flagged records API: https://assignment-esg-ingestion.onrender.com/api/review/records/flagged/
+- Batches API: https://assignment-esg-ingestion.onrender.com/api/review/batches/
+- Parse errors API: https://assignment-esg-ingestion.onrender.com/api/review/errors/
 
 ## Architecture
 
