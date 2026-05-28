@@ -3,12 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# ─────────────────────────────────────────────
-# TENANT LAYER
-# Every object is scoped to a Tenant.
-# Analysts belong to a Tenant; data never leaks across tenants.
-# ─────────────────────────────────────────────
-
+# Tenant layer
 class Tenant(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -32,13 +27,7 @@ class TenantMembership(models.Model):
         unique_together = ("user", "tenant")
 
 
-# ─────────────────────────────────────────────
-# INGESTION BATCH
-# One IngestionBatch = one upload or pull event.
-# Tracks source type, raw payload reference, and ingestion metadata.
-# The batch is immutable once closed; rows point back to it.
-# ─────────────────────────────────────────────
-
+# Ingestion batch
 class IngestionBatch(models.Model):
     SOURCE_SAP = "sap"
     SOURCE_UTILITY = "utility"
@@ -80,16 +69,7 @@ class IngestionBatch(models.Model):
         return f"{self.tenant.slug} / {self.source_type} / {self.ingested_at:%Y-%m-%d}"
 
 
-# ─────────────────────────────────────────────
-# CANONICAL EMISSION RECORD
-# One row = one normalized activity entry.
-# All three sources produce EmissionRecord rows.
-# Scope classification follows GHG Protocol:
-#   Scope 1 = direct (fuel combustion, fleet)
-#   Scope 2 = indirect electricity
-#   Scope 3 = value chain (travel, procurement)
-# ─────────────────────────────────────────────
-
+# Canonical emission record
 class EmissionRecord(models.Model):
     SCOPE_1 = 1
     SCOPE_2 = 2
@@ -126,35 +106,35 @@ class EmissionRecord(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="records")
     batch = models.ForeignKey(IngestionBatch, on_delete=models.CASCADE, related_name="records")
 
-    # ── Activity window ──────────────────────────────────────────────────
+    # Activity window
     activity_date = models.DateField()
     period_start = models.DateField(null=True, blank=True)
     period_end = models.DateField(null=True, blank=True)
 
-    # ── Classification ───────────────────────────────────────────────────
+    # Classification
     scope = models.IntegerField(choices=SCOPES)
     category = models.CharField(max_length=40, choices=CATEGORIES)
     source_type = models.CharField(max_length=20)
 
-    # ── Raw activity quantity ─────────────────────────────────────────────
+    # Raw activity quantity
     raw_quantity = models.DecimalField(max_digits=18, decimal_places=4)
     raw_unit = models.CharField(max_length=50)
     normalized_quantity = models.DecimalField(max_digits=18, decimal_places=6)
     normalized_unit = models.CharField(max_length=50)
 
-    # ── Emission computation ──────────────────────────────────────────────
+    # Emission computation
     emission_factor = models.DecimalField(max_digits=14, decimal_places=8, null=True, blank=True)
     emission_factor_source = models.CharField(max_length=255, blank=True)
     co2e_kg = models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)
 
-    # ── Source metadata ──────────────────────────────────────────────────
+    # Source metadata
     location_code = models.CharField(max_length=100, blank=True)
     location_label = models.CharField(max_length=255, blank=True)
     vendor_or_carrier = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     source_row_id = models.CharField(max_length=255, blank=True)
 
-    # ── Review workflow ───────────────────────────────────────────────────
+    # Review workflow
     review_status = models.CharField(max_length=20, choices=STATUSES, default=STATUS_PENDING)
     reviewed_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_records"
@@ -162,12 +142,12 @@ class EmissionRecord(models.Model):
     reviewed_at = models.DateTimeField(null=True, blank=True)
     review_note = models.TextField(blank=True)
 
-    # ── Audit flags ──────────────────────────────────────────────────────
+    # Audit flags
     is_edited = models.BooleanField(default=False)
     is_locked = models.BooleanField(default=False)
     flag_reason = models.TextField(blank=True)
 
-    # ── Timestamps ───────────────────────────────────────────────────────
+    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -183,12 +163,7 @@ class EmissionRecord(models.Model):
         return f"{self.category} / {self.activity_date} / {self.co2e_kg} kgCO2e"
 
 
-# ─────────────────────────────────────────────
-# AUDIT TRAIL
-# Immutable log. Every state change appends a row here.
-# Never deleted. This is what auditors actually see.
-# ─────────────────────────────────────────────
-
+# Audit trail
 class AuditEvent(models.Model):
     ACTION_INGESTED = "ingested"
     ACTION_EDITED = "edited"
@@ -217,12 +192,7 @@ class AuditEvent(models.Model):
         ordering = ["timestamp"]
 
 
-# ─────────────────────────────────────────────
-# PARSE ERROR LOG
-# Rows that fail parsing never silently disappear.
-# Each failure gets a ParseError with the raw line and reason.
-# ─────────────────────────────────────────────
-
+# Parse error log
 class ParseError(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     batch = models.ForeignKey(IngestionBatch, on_delete=models.CASCADE, related_name="parse_errors")
@@ -235,12 +205,7 @@ class ParseError(models.Model):
         ordering = ["row_index"]
 
 
-# ─────────────────────────────────────────────
-# LOOKUP TABLES
-# SAP plant codes, meter IDs, airport IATA codes → human labels.
-# Tenants can override global lookups with their own mappings.
-# ─────────────────────────────────────────────
-
+# Lookup tables
 class LocationLookup(models.Model):
     tenant = models.ForeignKey(Tenant, null=True, blank=True, on_delete=models.CASCADE)
     code = models.CharField(max_length=100)

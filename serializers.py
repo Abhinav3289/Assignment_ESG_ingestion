@@ -5,10 +5,7 @@ from .models import (
 )
 
 
-# ─────────────────────────────────────────────
-# BATCH SERIALIZERS
-# ─────────────────────────────────────────────
-
+# Batch serializers
 class IngestionBatchSerializer(serializers.ModelSerializer):
     uploaded_by_name = serializers.SerializerMethodField()
 
@@ -23,10 +20,7 @@ class IngestionBatchSerializer(serializers.ModelSerializer):
         return obj.uploaded_by.get_full_name() or obj.uploaded_by.username if obj.uploaded_by else None
 
 
-# ─────────────────────────────────────────────
-# EMISSION RECORD SERIALIZERS
-# ─────────────────────────────────────────────
-
+# Emission record serializers
 class EmissionRecordSerializer(serializers.ModelSerializer):
     scope_label = serializers.SerializerMethodField()
     category_label = serializers.SerializerMethodField()
@@ -56,8 +50,6 @@ class EmissionRecordSerializer(serializers.ModelSerializer):
 
 
 class EmissionRecordUpdateSerializer(serializers.ModelSerializer):
-    """Restricted serializer for analyst edits — prevents touching locked or audit fields."""
-
     class Meta:
         model = EmissionRecord
         fields = ["review_status", "review_note", "description", "location_label"]
@@ -68,10 +60,7 @@ class EmissionRecordUpdateSerializer(serializers.ModelSerializer):
         return attrs
 
 
-# ─────────────────────────────────────────────
-# AUDIT TRAIL SERIALIZER
-# ─────────────────────────────────────────────
-
+# Audit trail serializer
 class AuditEventSerializer(serializers.ModelSerializer):
     actor_name = serializers.SerializerMethodField()
 
@@ -83,10 +72,7 @@ class AuditEventSerializer(serializers.ModelSerializer):
         return obj.actor.get_full_name() or obj.actor.username if obj.actor else "system"
 
 
-# ─────────────────────────────────────────────
-# PARSE ERROR SERIALIZER
-# ─────────────────────────────────────────────
-
+# Parse error serializer
 class ParseErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParseError

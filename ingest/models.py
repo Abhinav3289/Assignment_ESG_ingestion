@@ -3,10 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# =========================================================
-# TENANT
-# =========================================================
-
+# Tenant
 class Tenant(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -51,10 +48,7 @@ class TenantMembership(models.Model):
         unique_together = ("user", "tenant")
 
 
-# =========================================================
-# INGESTION BATCH
-# =========================================================
-
+# Ingestion batch
 class IngestionBatch(models.Model):
 
     SOURCE_SAP = "sap"
@@ -129,10 +123,7 @@ class IngestionBatch(models.Model):
         return f"{self.source_type} - {self.ingested_at}"
 
 
-# =========================================================
-# EMISSION RECORD
-# =========================================================
-
+# Emission record
 class EmissionRecord(models.Model):
 
     SCOPE_1 = 1
@@ -269,10 +260,7 @@ class EmissionRecord(models.Model):
         return f"{self.category} - {self.co2e_kg}"
 
 
-# =========================================================
-# AUDIT EVENT
-# =========================================================
-
+# Audit event
 class AuditEvent(models.Model):
 
     ACTION_INGESTED = "ingested"
@@ -313,10 +301,7 @@ class AuditEvent(models.Model):
     note = models.TextField(blank=True)
 
 
-# =========================================================
-# PARSE ERROR
-# =========================================================
-
+# Parse error
 class ParseError(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -336,10 +321,7 @@ class ParseError(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-# =========================================================
-# LOCATION LOOKUP
-# =========================================================
-
+# Location lookup
 class LocationLookup(models.Model):
 
     tenant = models.ForeignKey(
