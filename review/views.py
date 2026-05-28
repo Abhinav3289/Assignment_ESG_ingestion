@@ -20,10 +20,7 @@ from ingest.serializers import (
 )
 
 
-# =========================================================
-# RECORD LIST API
-# =========================================================
-
+# Record list API
 class RecordListAPIView(APIView):
 
     def get(self, request):
@@ -35,10 +32,7 @@ class RecordListAPIView(APIView):
         return Response(serializer.data)
 
 
-# =========================================================
-# FLAGGED RECORDS
-# =========================================================
-
+# Flagged records
 class FlaggedRecordsAPIView(APIView):
 
     def get(self, request):
@@ -52,10 +46,7 @@ class FlaggedRecordsAPIView(APIView):
         return Response(serializer.data)
 
 
-# =========================================================
-# APPROVE RECORD
-# =========================================================
-
+# Approve record
 class ApproveRecordAPIView(APIView):
 
     def post(self, request, record_id):
@@ -97,10 +88,7 @@ class ApproveRecordAPIView(APIView):
         })
 
 
-# =========================================================
-# REJECT RECORD
-# =========================================================
-
+# Reject record
 class RejectRecordAPIView(APIView):
 
     def post(self, request, record_id):
@@ -140,10 +128,7 @@ class RejectRecordAPIView(APIView):
         })
 
 
-# =========================================================
-# INGESTION BATCHES
-# =========================================================
-
+# Ingestion batches
 class BatchListAPIView(APIView):
 
     def get(self, request):
@@ -155,10 +140,7 @@ class BatchListAPIView(APIView):
         return Response(serializer.data)
 
 
-# =========================================================
-# PARSE ERRORS
-# =========================================================
-
+# Parse errors
 class ParseErrorListAPIView(APIView):
 
     def get(self, request):
@@ -170,10 +152,7 @@ class ParseErrorListAPIView(APIView):
         return Response(serializer.data)
 
 
-# =========================================================
-# AUDIT TRAIL
-# =========================================================
-
+# Audit trail
 class AuditTrailAPIView(APIView):
 
     def get(self, request, record_id):

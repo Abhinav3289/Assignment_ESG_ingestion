@@ -22,33 +22,18 @@ from .parsers import (
 )
 
 
-# =========================================================
-# INGESTION API
-# =========================================================
-
+# Ingestion API
 class UploadIngestionAPIView(APIView):
 
     parser_classes = [MultiPartParser, FormParser]
 
-    # -----------------------------------------------------
-    # GET
-    # -----------------------------------------------------
-
     def get(self, request):
         return render(request, "upload.html")
-
-    # -----------------------------------------------------
-    # POST
-    # -----------------------------------------------------
 
     def post(self, request):
 
         source_type = request.data.get("source_type")
         uploaded_file = request.FILES.get("file")
-
-        # -------------------------------------------------
-        # VALIDATION
-        # -------------------------------------------------
 
         if not source_type:
             return Response(
@@ -62,10 +47,6 @@ class UploadIngestionAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # -------------------------------------------------
-        # TEMP USER + TENANT
-        # -------------------------------------------------
-
         tenant, _ = Tenant.objects.get_or_create(
             slug="demo-company",
             defaults={"name": "Demo Company"}
@@ -74,10 +55,6 @@ class UploadIngestionAPIView(APIView):
         user, _ = User.objects.get_or_create(
             username="system_user"
         )
-
-        # -------------------------------------------------
-        # CREATE INGESTION BATCH
-        # -------------------------------------------------
 
         batch = IngestionBatch.objects.create(
             tenant=tenant,
@@ -90,17 +67,9 @@ class UploadIngestionAPIView(APIView):
 
         try:
 
-            # -------------------------------------------------
-            # READ FILE CONTENT
-            # -------------------------------------------------
-
             uploaded_file.seek(0)
 
             file_content = uploaded_file.read()
-
-            # -------------------------------------------------
-            # PARSE FILE
-            # -------------------------------------------------
 
             if source_type == "sap":
 
@@ -121,10 +90,6 @@ class UploadIngestionAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # -------------------------------------------------
-            # DEBUG OUTPUT
-            # -------------------------------------------------
-
             print("====================================")
             print("PARSED ROWS:")
             print(parsed_rows)
@@ -134,15 +99,7 @@ class UploadIngestionAPIView(APIView):
             success_count = 0
             error_count = 0
 
-            # -------------------------------------------------
-            # PROCESS EACH ROW
-            # -------------------------------------------------
-
             for row in parsed_rows:
-
-                # ---------------------------------------------
-                # PARSE ERROR ROW
-                # ---------------------------------------------
 
                 if "_error" in row:
 
@@ -156,19 +113,11 @@ class UploadIngestionAPIView(APIView):
                     error_count += 1
                     continue
 
-                # ---------------------------------------------
-                # REVIEW STATUS
-                # ---------------------------------------------
-
                 review_status = (
                     EmissionRecord.STATUS_FLAGGED
                     if row.get("flag_reason")
                     else EmissionRecord.STATUS_PENDING
                 )
-
-                # ---------------------------------------------
-                # CREATE RECORD
-                # ---------------------------------------------
 
                 try:
 
@@ -203,10 +152,6 @@ class UploadIngestionAPIView(APIView):
                         review_status=review_status,
                     )
 
-                    # -----------------------------------------
-                    # AUDIT EVENT
-                    # -----------------------------------------
-
                     AuditEvent.objects.create(
                         record=record,
                         actor=user,
@@ -228,20 +173,12 @@ class UploadIngestionAPIView(APIView):
 
                     error_count += 1
 
-            # -------------------------------------------------
-            # UPDATE BATCH
-            # -------------------------------------------------
-
             batch.status = IngestionBatch.STATUS_DONE
             batch.row_count = success_count
             batch.error_count = error_count
             batch.completed_at = timezone.now()
 
             batch.save()
-
-            # -------------------------------------------------
-            # RESPONSE
-            # -------------------------------------------------
 
             return Response({
                 "message": "Ingestion completed",

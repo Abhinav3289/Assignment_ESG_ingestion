@@ -5,10 +5,7 @@ from decimal import Decimal
 from datetime import datetime
 
 
-# =========================================================
-# DATE PARSER
-# =========================================================
-
+# Date parser
 DATE_FORMATS = [
     "%Y-%m-%d",
     "%d-%m-%Y",
@@ -32,10 +29,7 @@ def parse_date(raw):
     raise ValueError(f"Invalid date: {raw}")
 
 
-# =========================================================
-# SAFE DECIMAL
-# =========================================================
-
+# Safe decimal
 def safe_decimal(value):
 
     cleaned = str(value).replace(",", "").strip()
@@ -58,10 +52,7 @@ def csv_reader(text):
     )
 
 
-# =========================================================
-# SAP PARSER
-# =========================================================
-
+# SAP parser
 def parse_sap_csv(file_content):
 
     text = file_content.decode("utf-8-sig")
@@ -129,10 +120,6 @@ def parse_sap_csv(file_content):
                 "flag_reason": "",
             }
 
-            # -----------------------------------------
-            # FLAG NEGATIVE VALUES
-            # -----------------------------------------
-
             if quantity <= 0:
 
                 result["flag_reason"] = (
@@ -155,10 +142,7 @@ def parse_sap_csv(file_content):
     return records
 
 
-# =========================================================
-# UTILITY PARSER
-# =========================================================
-
+# Utility parser
 def parse_utility_csv(file_content):
 
     text = file_content.decode("utf-8-sig")
@@ -248,10 +232,7 @@ def parse_utility_csv(file_content):
     return records
 
 
-# =========================================================
-# TRAVEL PARSER
-# =========================================================
-
+# Travel parser
 def parse_travel_csv(file_content):
 
     text = file_content.decode("utf-8-sig")

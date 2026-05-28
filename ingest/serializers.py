@@ -7,9 +7,7 @@ from .models import (
     ParseError,
 )
 
-# INGESTION BATCH
-
-
+# Ingestion batch serializer
 class IngestionBatchSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -17,9 +15,7 @@ class IngestionBatchSerializer(serializers.ModelSerializer):
 
         fields = "__all__"
 
-# EMISSION RECORD
-
-
+# Emission record serializer
 class EmissionRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -27,11 +23,7 @@ class EmissionRecordSerializer(serializers.ModelSerializer):
 
         fields = "__all__"
 
-
-
-# AUDIT EVENT
-
-
+# Audit event serializer
 class AuditEventSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -39,11 +31,7 @@ class AuditEventSerializer(serializers.ModelSerializer):
 
         fields = "__all__"
 
-
-
-# PARSE ERROR
-
-
+# Parse error serializer
 class ParseErrorSerializer(serializers.ModelSerializer):
 
     class Meta:
